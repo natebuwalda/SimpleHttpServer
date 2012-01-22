@@ -54,11 +54,25 @@ public class Server {
                 try {
                     System.out.println("Now accepting new connections.");
                     Socket connection = serverSocket.accept();
+                    threadPoolExecutor.execute(new ConnectionWorker(connection));
                 } catch (Exception e) {
                     System.err.println("The following error occured while the server was running:");
                     e.printStackTrace();
                 }
             }
+        }
+    }
+    
+    private class ConnectionWorker implements Runnable {
+        private Socket clientConnection;
+
+        private ConnectionWorker(Socket connection) {
+            clientConnection = connection;
+        }
+
+        @Override
+        public void run() {
+
         }
     }
 }
