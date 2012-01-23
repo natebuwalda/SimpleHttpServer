@@ -37,15 +37,26 @@ public class ConnectionWorker {
             requestedResource = tokenizer.nextToken();
             if (httpMethod.equals("GET")) {
                 System.out.println("Handling a GET HTTP request.");
-                String httpResponseCode = null;
-                String httpGetResponse = null;
+
+                String httpResponseCode;
+                String httpGetResponse;
+
                 if (requestedResource.equals("/")) {
                     httpResponseCode = HTTP_OK;
                     httpGetResponse = "<b>The SimpleHTTPServer works!</b>";
                 } else {
-                    File requestedFile = new File(String.format("/resources%s", requestedResource));
+                    String pathName = String.format("c:/github/natebuwalda/SimpleHttpServer/src/main/resources%s", requestedResource);
+                    File requestedFile = new File(pathName);
                     if (requestedFile.exists()) {
-                        
+                        BufferedReader pageReader = new BufferedReader(new FileReader(requestedFile));
+                        String pageFileLine = pageReader.readLine();
+                        StringBuilder page = new StringBuilder();
+                        while (pageFileLine != null) {
+                            page.append(pageFileLine);
+                            pageFileLine = pageReader.readLine();
+                        }
+                        httpResponseCode = HTTP_OK;
+                        httpGetResponse = page.toString();
                     } else {
                         httpResponseCode = HTTP_NOTFOUND;
                         httpGetResponse = "<b>SimpleHTTPServer could not find the page you were looking for (404)</b>";

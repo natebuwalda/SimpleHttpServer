@@ -71,6 +71,25 @@ public class ConnectionWorkerTest {
     }
 
     @Test
+    public void handleGetFound() throws Exception {
+        Socket mockSocket = mock(Socket.class);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        //stubbing behavior
+        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream("GET /index.html HTTP/1.1".getBytes()));
+        when(mockSocket.getOutputStream()).thenReturn(outputStream);
+
+        worker.handleConnection(mockSocket);
+
+        //assertions (leaving out the full results because it is large)
+        String results = outputStream.toString();
+        assertEquals(298, results.length());
+
+        outputStream.close();
+        outputStream.flush();
+    }
+
+    @Test
     public void handleUnknownHttpMethod() throws Exception {
         Socket mockSocket = mock(Socket.class);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
