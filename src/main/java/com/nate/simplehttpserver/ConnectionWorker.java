@@ -1,13 +1,15 @@
 package com.nate.simplehttpserver;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 public class ConnectionWorker {
+
+    private final String HTTP_OK = "HTTP/1.1 200 OK\r\n";
+    private final String HTTP_NOTFOUND = "HTTP/1.1 404 Not Found\r\n";
+
     public void handleConnection(Socket clientConnection) {
         try {
             BufferedReader input = new BufferedReader(new InputStreamReader(clientConnection.getInputStream()));
@@ -28,17 +30,36 @@ public class ConnectionWorker {
         String header = input.readLine();
         System.out.println(String.format("The header was: %s", header));
         StringTokenizer tokenizer = new StringTokenizer(header);
-        String httpMethod = tokenizer.nextToken();
 
-        if (httpMethod.equals("GET")) {
-            System.out.println("Handling a GET HTTP request.");
-            String httpGetResponseString = "<b>The SimpleHTTPServer works!</b>";
-            output.writeBytes(responseBuilder("HTTP/1.1 200 OK\r\n", httpGetResponseString));
-        } else {
-            System.out.println("Handling an unsupported HTTP request.");
-            String unknownHttpResponseString = "<b>The SimpleHTTPServer works! - but the requested HTTP method is not supported.</b>";
-            responseBuilder("HTTP/1.1 200 OK\r\n", unknownHttpResponseString);
-            output.writeBytes(responseBuilder("HTTP/1.1 200 OK\r\n", unknownHttpResponseString));
+        try {
+            String httpMethod = tokenizer.nextToken();
+            String requestedResource = "";
+            requestedResource = tokenizer.nextToken();
+            if (httpMethod.equals("GET")) {
+                System.out.println("Handling a GET HTTP request.");
+                String httpResponseCode = null;
+                String httpGetResponse = null;
+                if (requestedResource.equals("/")) {
+                    httpResponseCode = HTTP_OK;
+                    httpGetResponse = "<b>The SimpleHTTPServer works!</b>";
+                } else {
+                    File requestedFile = new File(String.format("/resources%s", requestedResource));
+                    if (requestedFile.exists()) {
+                        
+                    } else {
+                        httpResponseCode = HTTP_NOTFOUND;
+                        httpGetResponse = "<b>SimpleHTTPServer could not find the page you were looking for (404)</b>";
+                    }
+                }
+                output.writeBytes(responseBuilder(httpResponseCode, httpGetResponse));
+            } else {
+                System.out.println("Handling an unsupported HTTP request.");
+                String unknownHttpResponseString = "<b>The SimpleHTTPServer works! - but the requested HTTP method is not supported.</b>";
+                output.writeBytes(responseBuilder(HTTP_OK, unknownHttpResponseString));
+            }
+        } catch (NoSuchElementException nsee){
+            System.err.println("Received an incomplete request.");
+            output.writeBytes(responseBuilder(HTTP_NOTFOUND, "<b>Invalid request</b>"));
         }
     }
 

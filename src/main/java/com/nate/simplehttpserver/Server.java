@@ -17,8 +17,7 @@ public class Server {
         System.out.println("The server is starting for host 127.0.0.1 on port 8080...");
         try {
             serverSocket = new ServerSocket(8080, 10, InetAddress.getByName("127.0.0.1"));
-            BlockingQueue<Runnable> connectionQueue = new LinkedBlockingQueue<Runnable>();
-            threadPoolExecutor = new ThreadPoolExecutor(10, 20, 1000, TimeUnit.MILLISECONDS, connectionQueue);
+            threadPoolExecutor = new ThreadPoolExecutor(10, 20, 1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
             threadPoolExecutor.execute(new ServerWorkerWrapper());
             isStarted = true;
         } catch (Exception e) {

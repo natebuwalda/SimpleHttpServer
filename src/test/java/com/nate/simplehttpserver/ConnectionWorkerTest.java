@@ -21,12 +21,12 @@ public class ConnectionWorkerTest {
     private ConnectionWorker worker = new ConnectionWorker();
 
     @Test
-    public void handleGet() throws Exception {
+    public void handleGetOK() throws Exception {
         Socket mockSocket = mock(Socket.class);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         //stubbing behavior
-        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream("GET".getBytes()));
+        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream("GET / HTTP/1.1".getBytes()));
         when(mockSocket.getOutputStream()).thenReturn(outputStream);
 
         worker.handleConnection(mockSocket);
@@ -46,12 +46,37 @@ public class ConnectionWorkerTest {
     }
 
     @Test
+    public void handleGetNotFound() throws Exception {
+        Socket mockSocket = mock(Socket.class);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        //stubbing behavior
+        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream("GET /noexist.html HTTP/1.1".getBytes()));
+        when(mockSocket.getOutputStream()).thenReturn(outputStream);
+
+        worker.handleConnection(mockSocket);
+
+        //assertions
+        String results = outputStream.toString();
+        assertEquals("HTTP/1.1 404 Not Found\r\n" +
+                "Server: SimpleHttpServer\r\n" +
+                "Content-Type: text/html\r\n" +
+                "Content-Length: 74\r\n" +
+                "Connection: close\r\n" +
+                "\r\n" +
+                "<b>SimpleHTTPServer could not find the page you were looking for (404)</b>", results);
+
+        outputStream.close();
+        outputStream.flush();
+    }
+
+    @Test
     public void handleUnknownHttpMethod() throws Exception {
         Socket mockSocket = mock(Socket.class);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         //stubbing behavior
-        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream("GARBAGE".getBytes()));
+        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream("GARBAGE / HTTP/1.1".getBytes()));
         when(mockSocket.getOutputStream()).thenReturn(outputStream);
 
         worker.handleConnection(mockSocket);
