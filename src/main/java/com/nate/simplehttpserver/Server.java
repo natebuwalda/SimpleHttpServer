@@ -51,7 +51,7 @@ public class Server {
 
             System.out.println("Now accepting new connections.");
             while (isStarted) {
-               worker.acceptConnections();
+               worker.acceptConnection();
             }
         }
     }

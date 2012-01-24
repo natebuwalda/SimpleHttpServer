@@ -9,7 +9,7 @@ public class ServerWorker {
     private ServerSocket serverSocket;
     private ThreadPoolExecutor threadPoolExecutor;
 
-    public void acceptConnections() {
+    public void acceptConnection() {
         try {
             Socket connection = serverSocket.accept();
             ConnectionWorkerWrapper connectionWorker = new ConnectionWorkerWrapper(connection);

@@ -33,6 +33,18 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <formats>
+                        <format>xml</format>
+                        <format>html</format>
+                    </formats>
+                    <outputDirectory>${project.reporting.outputDirectory}/cobertura</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

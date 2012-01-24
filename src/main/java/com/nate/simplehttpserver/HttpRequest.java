@@ -12,52 +12,37 @@ public class HttpRequest {
     private String contentType;
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
-    public String getHttpMethod() {
-        return httpMethod;
+    public HttpRequest(String httpMethod, String uri, String header) {
+        this.httpMethod = httpMethod;
+        this.uri = uri;
+        this.contentType = parseOptionalHeader("Content-Type", header);
+        this.contentLength = parseOptionalHeader("Content-Length", header);
+        this.host = parseOptionalHeader("Host", header);
+        this.userAgent = parseOptionalHeader("User-Agent", header);
     }
 
-    public void setHttpMethod(String httpMethod) {
-        this.httpMethod = httpMethod;
+    public String getHttpMethod() {
+        return httpMethod;
     }
 
     public String getUri() {
         return uri;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
     public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
+        return host.trim();
     }
 
     public String getUserAgent() {
         return userAgent;
     }
 
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
-    }
-
     public String getContentLength() {
         return contentLength;
     }
 
-    public void setContentLength(String contentLength) {
-        this.contentLength = contentLength;
-    }
-
     public String getContentType() {
         return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
     }
 
     public void addParameter(String key, Object value) {
@@ -68,15 +53,14 @@ public class HttpRequest {
         return parameters;
     }
 
-    @Override
-    public String toString() {
-        return "HttpRequest{" +
-                "httpMethod='" + httpMethod + '\'' +
-                ", uri='" + uri + '\'' +
-                ", host='" + host + '\'' +
-                ", userAgent='" + userAgent + '\'' +
-                ", contentLength='" + contentLength + '\'' +
-                ", contentType='" + contentType + '\'' +
-                '}';
+    private String parseOptionalHeader(String headerType, String header) {
+        String result = null;
+        int headerTypeIndex = header.indexOf(headerType);
+        if (headerTypeIndex > -1) {
+            int indexOffset = headerType.length() + 2;
+            result = header.substring(headerTypeIndex  + indexOffset, header.indexOf("\n", headerTypeIndex)).trim();
+        }
+        return result;
     }
+
 }
