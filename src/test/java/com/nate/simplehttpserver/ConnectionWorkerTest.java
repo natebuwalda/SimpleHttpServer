@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.Socket;
+import java.util.StringTokenizer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -83,6 +84,9 @@ public class ConnectionWorkerTest {
 
         //assertions (leaving out the full results because it is large)
         String results = outputStream.toString();
+        StringTokenizer tokenizer = new StringTokenizer(results, "\r\n");
+        String httpCode = tokenizer.nextToken();
+        assertEquals("HTTP/1.1 200 OK", httpCode);
         assertEquals(298, results.length());
 
         outputStream.close();

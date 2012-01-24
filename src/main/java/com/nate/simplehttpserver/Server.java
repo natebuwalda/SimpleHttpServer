@@ -2,7 +2,6 @@ package com.nate.simplehttpserver;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,11 +11,12 @@ public class Server {
     private boolean isStarted = false;     
     private ServerSocket serverSocket;
     private ThreadPoolExecutor threadPoolExecutor;
+    private final Configuration config = Configuration.getInstance();
 
     public boolean start() {
-        System.out.println("The server is starting for host 127.0.0.1 on port 8080...");
+        System.out.println(String.format("The server is starting for host %s on port %s...", config.getServerHost(), config.getServerPort()));
         try {
-            serverSocket = new ServerSocket(8080, 10, InetAddress.getByName("127.0.0.1"));
+            serverSocket = new ServerSocket(config.getServerPort(), 10, InetAddress.getByName(config.getServerHost()));
             threadPoolExecutor = new ThreadPoolExecutor(10, 20, 1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
             threadPoolExecutor.execute(new ServerWorkerWrapper());
             isStarted = true;

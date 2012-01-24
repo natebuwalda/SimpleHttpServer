@@ -13,8 +13,6 @@ public class ServerTest {
         boolean started = testServer.start();
         assertTrue("Server should be started", started);
 
-        Thread.sleep(1000);
-        
         boolean stopped = testServer.stop();
         assertTrue("Server should be stopped", stopped);
     }

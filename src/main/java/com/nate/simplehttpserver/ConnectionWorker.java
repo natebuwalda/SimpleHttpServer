@@ -7,8 +7,9 @@ import java.util.StringTokenizer;
 
 public class ConnectionWorker {
 
-    private final String HTTP_OK = "HTTP/1.1 200 OK\r\n";
-    private final String HTTP_NOTFOUND = "HTTP/1.1 404 Not Found\r\n";
+    private static final String HTTP_OK = "HTTP/1.1 200 OK\r\n";
+    private static final String HTTP_NOTFOUND = "HTTP/1.1 404 Not Found\r\n";
+    private final Configuration config = Configuration.getInstance();
 
     public void handleConnection(Socket clientConnection) {
         try {
@@ -45,7 +46,7 @@ public class ConnectionWorker {
                     httpResponseCode = HTTP_OK;
                     httpGetResponse = "<b>The SimpleHTTPServer works!</b>";
                 } else {
-                    String pathName = String.format("c:/github/natebuwalda/SimpleHttpServer/src/main/resources%s", requestedResource);
+                    String pathName = config.getSiteBasedir() + requestedResource;
                     File requestedFile = new File(pathName);
                     if (requestedFile.exists()) {
                         BufferedReader pageReader = new BufferedReader(new FileReader(requestedFile));
