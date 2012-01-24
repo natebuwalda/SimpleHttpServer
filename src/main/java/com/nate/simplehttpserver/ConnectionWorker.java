@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class ConnectionWorker {
@@ -17,24 +18,41 @@ public class ConnectionWorker {
             DataOutputStream output = new DataOutputStream(clientConnection.getOutputStream());
 
             StringBuilder headerBuilder = new StringBuilder();
-            String headerLine = input.readLine();
-            boolean continueReading = (headerLine != null && !headerLine.trim().isEmpty());
-            while (continueReading) {
-                headerBuilder.append(headerLine.trim()).append(" \n");
-                headerLine = input.readLine();
-                continueReading = (headerLine != null && !headerLine.trim().isEmpty());
-            }
+            do {
+                String headerLine = input.readLine();
+                System.out.println(headerLine);
+                headerBuilder.append(headerLine.trim()).append("\n");
+            } while (input.ready());
+
             String header = headerBuilder.toString();
             System.out.println(String.format("The header was: %s", header));
-            StringTokenizer tokenizer = new StringTokenizer(header);
 
             try {
+                StringTokenizer tokenizer = new StringTokenizer(header);
                 String httpMethod = tokenizer.nextToken();
                 String requestedResource = "";
                 requestedResource = tokenizer.nextToken();
 
                 HttpMethodHandler handler = handlerFactory.createHandler(httpMethod);
-                output.writeBytes(handler.handle(requestedResource));
+                HttpRequest request = new HttpRequest();
+                request.setHttpMethod(httpMethod);
+                request.setUri(requestedResource);
+                
+                int contentTypeIndex = header.indexOf("Content-Type");
+                if (contentTypeIndex > -1) {
+                    request.setContentType(header.substring(contentTypeIndex  + 14, header.indexOf("\n", contentTypeIndex)));
+                }
+                
+                int contentLengthIndex = header.indexOf("Content-Length");
+                if (contentLengthIndex > -1) {
+                    request.setContentLength(header.substring(contentLengthIndex + 16, header.indexOf("\n", contentLengthIndex)));
+                }
+                
+                if (request.getContentLength() != null && Integer.parseInt(request.getContentLength()) > 0) {
+                    System.out.println("Looking for request body");
+                }
+                
+                output.writeBytes(handler.handle(request));
 
             } catch (NoSuchElementException nsee) {
                 System.err.println(String.format("Received an incomplete request: %s", headerBuilder));

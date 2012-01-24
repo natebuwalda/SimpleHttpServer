@@ -11,14 +11,14 @@ public class HttpHandlerFactoryTest {
     
     @Test
     public void handleGet() {
-        AbstractHttpMethodHandler handler = factory.createHandler("GET");
+        HttpMethodHandler handler = factory.createHandler("GET");
         assertNotNull(handler);
         assertTrue(handler instanceof GetHttpMethodHandler);
     }
 
     @Test
     public void handleUnknown() {
-        AbstractHttpMethodHandler handler = factory.createHandler("GARBAGE");
+        HttpMethodHandler handler = factory.createHandler("GARBAGE");
         assertNotNull(handler);
         assertTrue(handler instanceof UnsupportedHttpMethodHandler);
     }

@@ -15,10 +15,12 @@ public class HttpHandlerFactory {
         return instance;
     }
 
-    public AbstractHttpMethodHandler createHandler(String httpMethod) {
-        AbstractHttpMethodHandler handler = null;
+    public HttpMethodHandler createHandler(String httpMethod) {
+        HttpMethodHandler handler = null;
         if ("GET".equals(httpMethod)) {
             handler = new GetHttpMethodHandler();
+        } else if ("POST".equals(httpMethod)) {
+            handler = new PostHttpMethodHandler();
         } else {
             handler = new UnsupportedHttpMethodHandler();
         }

@@ -1,35 +1,25 @@
 package com.nate.simplehttpserver;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
 public class GetHttpMethodHandler extends AbstractHttpMethodHandler {
 
-    private final Configuration config = Configuration.getInstance();
-
     @Override
-    public String handle(String requestedResource) throws IOException {
+    public String handle(HttpRequest request) throws IOException {
         System.out.println("Handling a GET HTTP request.");
 
         String httpResponseCode;
         String httpGetResponse;
 
-        if (requestedResource.equals("/")) {
+        if ("/".equals(request.getUri())) {
             httpResponseCode = HttpResponseConstants.HTTP_OK;
             httpGetResponse = "<b>The SimpleHTTPServer works!</b>";
         } else {
-            String pathName = config.getSiteBasedir() + requestedResource;
+            String pathName = config.getSiteBasedir() + request.getUri();
             File requestedFile = new File(pathName);
             if (requestedFile.exists()) {
-                BufferedReader pageReader = new BufferedReader(new FileReader(requestedFile));
-                String pageFileLine = pageReader.readLine();
-                StringBuilder page = new StringBuilder();
-                while (pageFileLine != null) {
-                    page.append(pageFileLine);
-                    pageFileLine = pageReader.readLine();
-                }
+                StringBuilder page = readResourceToString(requestedFile);
                 httpResponseCode = HttpResponseConstants.HTTP_OK;
                 httpGetResponse = page.toString();
             } else {
