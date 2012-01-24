@@ -7,16 +7,38 @@ import java.util.StringTokenizer;
 
 public class ConnectionWorker {
 
-    private static final String HTTP_OK = "HTTP/1.1 200 OK\r\n";
-    private static final String HTTP_NOTFOUND = "HTTP/1.1 404 Not Found\r\n";
     private final Configuration config = Configuration.getInstance();
+    private final HttpHandlerFactory handlerFactory = HttpHandlerFactory.getInstance();
 
     public void handleConnection(Socket clientConnection) {
         try {
             BufferedReader input = new BufferedReader(new InputStreamReader(clientConnection.getInputStream()));
             DataOutputStream output = new DataOutputStream(clientConnection.getOutputStream());
 
-            routeRequest(input, output);
+            StringBuilder headerBuilder = new StringBuilder();
+            String headerLine = input.readLine();
+            boolean continueReading = (headerLine != null && !headerLine.trim().isEmpty());
+            while (continueReading) {
+                headerBuilder.append(headerLine.trim() + "\n");
+                headerLine = input.readLine();
+                continueReading = (headerLine != null && !headerLine.trim().isEmpty());
+            }
+            String header = headerBuilder.toString();
+            System.out.println(String.format("The header was: %s", header));
+            StringTokenizer tokenizer = new StringTokenizer(header);
+
+            try {
+                String httpMethod = tokenizer.nextToken();
+                String requestedResource = "";
+                requestedResource = tokenizer.nextToken();
+
+                HttpHandler handler = handlerFactory.createHandler(httpMethod);
+                output.writeBytes(handler.handle(requestedResource));
+
+            } catch (NoSuchElementException nsee) {
+                System.err.println(String.format("Received an incomplete request: %s", headerBuilder));
+                throw nsee;
+            }
 
             input.close();
             output.close();
@@ -25,65 +47,6 @@ public class ConnectionWorker {
             System.out.println("The following error occured processing a client connection:");
             e.printStackTrace();
         }
-    }
-
-    protected void routeRequest(BufferedReader input, DataOutputStream output) throws IOException {
-        String header = input.readLine();
-        System.out.println(String.format("The header was: %s", header));
-        StringTokenizer tokenizer = new StringTokenizer(header);
-
-        try {
-            String httpMethod = tokenizer.nextToken();
-            String requestedResource = "";
-            requestedResource = tokenizer.nextToken();
-            if (httpMethod.equals("GET")) {
-                System.out.println("Handling a GET HTTP request.");
-
-                String httpResponseCode;
-                String httpGetResponse;
-
-                if (requestedResource.equals("/")) {
-                    httpResponseCode = HTTP_OK;
-                    httpGetResponse = "<b>The SimpleHTTPServer works!</b>";
-                } else {
-                    String pathName = config.getSiteBasedir() + requestedResource;
-                    File requestedFile = new File(pathName);
-                    if (requestedFile.exists()) {
-                        BufferedReader pageReader = new BufferedReader(new FileReader(requestedFile));
-                        String pageFileLine = pageReader.readLine();
-                        StringBuilder page = new StringBuilder();
-                        while (pageFileLine != null) {
-                            page.append(pageFileLine);
-                            pageFileLine = pageReader.readLine();
-                        }
-                        httpResponseCode = HTTP_OK;
-                        httpGetResponse = page.toString();
-                    } else {
-                        httpResponseCode = HTTP_NOTFOUND;
-                        httpGetResponse = "<b>SimpleHTTPServer could not find the page you were looking for (404)</b>";
-                    }
-                }
-                output.writeBytes(responseBuilder(httpResponseCode, httpGetResponse));
-            } else {
-                System.out.println("Handling an unsupported HTTP request.");
-                String unknownHttpResponseString = "<b>The SimpleHTTPServer works! - but the requested HTTP method is not supported.</b>";
-                output.writeBytes(responseBuilder(HTTP_OK, unknownHttpResponseString));
-            }
-        } catch (NoSuchElementException nsee){
-            System.err.println("Received an incomplete request.");
-            output.writeBytes(responseBuilder(HTTP_NOTFOUND, "<b>Invalid request</b>"));
-        }
-    }
-
-    private String responseBuilder(String responseCode, String responseString) {
-        StringBuilder outputString = new StringBuilder(responseCode);
-        outputString.append("Server: SimpleHttpServer\r\n");
-        outputString.append("Content-Type: text/html\r\n");
-        outputString.append(String.format("Content-Length: %d\r\n", responseString.length()));
-        outputString.append("Connection: close\r\n");
-        outputString.append("\r\n");
-        outputString.append(responseString);
-        return outputString.toString();
     }
 
 }
