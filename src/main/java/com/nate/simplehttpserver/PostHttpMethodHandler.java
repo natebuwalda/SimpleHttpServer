@@ -2,6 +2,7 @@ package com.nate.simplehttpserver;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public class PostHttpMethodHandler extends AbstractHttpMethodHandler {
 
@@ -16,6 +17,13 @@ public class PostHttpMethodHandler extends AbstractHttpMethodHandler {
         if (requestedFile.exists()) {
             StringBuilder page = readResourceToString(requestedFile);
             httpResponseCode = HttpResponseConstants.HTTP_OK;
+            
+            //do something with the parameters
+            System.out.println("POST parameters");
+            for (Map.Entry entry : request.getParameters().entrySet()) {
+                System.out.println(String.format("Key: %s, Value: %s", entry.getKey(), entry.getValue()));
+            }
+            
             httpPostResponse = page.toString();
         } else {
             httpResponseCode = HttpResponseConstants.HTTP_NOTFOUND;

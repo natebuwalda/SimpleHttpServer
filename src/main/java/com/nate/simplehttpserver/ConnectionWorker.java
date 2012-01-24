@@ -18,12 +18,13 @@ public class ConnectionWorker {
             DataOutputStream output = new DataOutputStream(clientConnection.getOutputStream());
 
             StringBuilder headerBuilder = new StringBuilder();
-            do {
-                String headerLine = input.readLine();
-                System.out.println(headerLine);
+            String headerLine = input.readLine();
+            boolean continueReading = (headerLine != null && !headerLine.trim().isEmpty());
+            while (continueReading) {
                 headerBuilder.append(headerLine.trim()).append("\n");
-            } while (input.ready());
-
+                headerLine = input.readLine();
+                continueReading = ((headerLine != null && !headerLine.trim().isEmpty()));
+            }
             String header = headerBuilder.toString();
             System.out.println(String.format("The header was: %s", header));
 
@@ -49,7 +50,16 @@ public class ConnectionWorker {
                 }
                 
                 if (request.getContentLength() != null && Integer.parseInt(request.getContentLength()) > 0) {
-                    System.out.println("Looking for request body");
+                    int requestBodyLength = Integer.parseInt(request.getContentLength());
+                    char[] requestBodyBuffer = new char[requestBodyLength];
+                    input.read(requestBodyBuffer);
+                    String requestBody = new String(requestBodyBuffer);
+                    System.out.println(String.format("Request body: %s", requestBody));
+                    String[] splitParams = requestBody.split("&");
+                    for (String params : splitParams) {
+                        String[] keyValue = params.split("=");
+                        request.addParameter(keyValue[0], keyValue[1]);
+                    }
                 }
                 
                 output.writeBytes(handler.handle(request));

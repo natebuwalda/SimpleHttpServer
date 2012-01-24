@@ -60,6 +60,14 @@ public class HttpRequest {
         this.contentType = contentType;
     }
 
+    public void addParameter(String key, Object value) {
+        this.parameters.put(key, value);
+    }
+
+    public Map<String, Object> getParameters() {
+        return parameters;
+    }
+
     @Override
     public String toString() {
         return "HttpRequest{" +
