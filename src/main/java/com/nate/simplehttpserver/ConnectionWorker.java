@@ -20,7 +20,7 @@ public class ConnectionWorker {
             String headerLine = input.readLine();
             boolean continueReading = (headerLine != null && !headerLine.trim().isEmpty());
             while (continueReading) {
-                headerBuilder.append(headerLine.trim() + "\n");
+                headerBuilder.append(headerLine.trim()).append(" \n");
                 headerLine = input.readLine();
                 continueReading = (headerLine != null && !headerLine.trim().isEmpty());
             }
@@ -33,7 +33,7 @@ public class ConnectionWorker {
                 String requestedResource = "";
                 requestedResource = tokenizer.nextToken();
 
-                HttpHandler handler = handlerFactory.createHandler(httpMethod);
+                HttpMethodHandler handler = handlerFactory.createHandler(httpMethod);
                 output.writeBytes(handler.handle(requestedResource));
 
             } catch (NoSuchElementException nsee) {
