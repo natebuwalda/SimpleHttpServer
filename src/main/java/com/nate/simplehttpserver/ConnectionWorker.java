@@ -1,13 +1,14 @@
 package com.nate.simplehttpserver;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 public class ConnectionWorker {
 
-    private final Configuration config = Configuration.getInstance();
     private final HttpHandlerFactory handlerFactory = HttpHandlerFactory.getInstance();
 
     public void handleConnection(Socket clientConnection) {
