@@ -3,6 +3,11 @@ package com.nate.simplehttpserver;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ * A wrapper for the server configuration properties
+ *
+ * @author Nate Buwalda
+ */
 public class Configuration {
 
     private static Configuration instance = null;

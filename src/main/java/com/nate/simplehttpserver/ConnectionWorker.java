@@ -8,10 +8,23 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+/**
+ * The worker class for handling client connections to the server.  It is run by the
+ * ConnectionWorkerWrapper private class of {@link ServerWorker}.
+ * 
+ * @author Nate Buwalda
+ */
 public class ConnectionWorker {
 
     private final HttpHandlerFactory handlerFactory = HttpHandlerFactory.getInstance();
 
+    /**
+     * Receives a socket from the ServerWorker class.  This socket is created new for
+     * each client connection to the server.  It will then parse through the HTTP
+     * request and respond to the client appropriately.
+     *
+     * @param clientConnection
+     */
     public void handleConnection(Socket clientConnection) {
         try {
             BufferedReader input = new BufferedReader(new InputStreamReader(clientConnection.getInputStream()));
@@ -66,6 +79,12 @@ public class ConnectionWorker {
         }
     }
 
+    /**
+     * Helper method to tell the worker to continue reading from the client socket or not.
+     *
+     * @param headerLine
+     * @return
+     */
     private boolean shouldContinueReading(String headerLine) {
         return (headerLine != null && !headerLine.trim().isEmpty());
     }

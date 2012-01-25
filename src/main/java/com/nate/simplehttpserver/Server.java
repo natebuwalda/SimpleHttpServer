@@ -6,6 +6,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The root class for all server work.  Maintains a thread pool for all the various worker runnables
+ * and a server socket for listening for new client connections.
+ * 
+ * @author Nate Buwalda
+ */
 public class Server {
 
     private boolean isStarted = false;     
@@ -13,6 +19,11 @@ public class Server {
     private ThreadPoolExecutor threadPoolExecutor;
     private final Configuration config = Configuration.getInstance();
 
+    /**
+     * Starts the server with the specified configuration.
+     * 
+     * @return
+     */
     public boolean start() {
         System.out.println(String.format("The server is starting for host %s on port %s...", config.getServerHost(), config.getServerPort()));
         try {
@@ -28,6 +39,11 @@ public class Server {
         return isStarted;
     }
 
+    /**
+     * Attempts to stop the server.
+     * 
+     * @return
+     */
     public boolean stop() {
         System.out.println("Server is now shutting down...");
         try {
@@ -41,7 +57,10 @@ public class Server {
         }
         return !isStarted;
     }
-    
+
+    /**
+     * Runnable wrapper class for {@link ServerWorker}.
+     */
     private class ServerWorkerWrapper implements Runnable {
         @Override
         public void run() {

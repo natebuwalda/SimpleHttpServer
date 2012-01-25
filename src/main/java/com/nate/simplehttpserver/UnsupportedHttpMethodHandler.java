@@ -2,6 +2,11 @@ package com.nate.simplehttpserver;
 
 import java.io.IOException;
 
+/**
+ * Handler for any HTTP method the server currently doesn't support.
+ *
+ * @author Nate Buwalda
+ */
 public class UnsupportedHttpMethodHandler extends AbstractHttpMethodHandler {
 
     @Override

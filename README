@@ -1,1 +1,51 @@
-This file was created by IntelliJ IDEA 11.0.1 for binding GitHub repository
+SimpleHTTPServer
+
+===========
+Description
+===========
+
+A very basic HTTP server written purely with the Java 1.6 JDK.
+
+========
+Features
+========
+
+* Currently supports GET and POST HTTP methods.
+* It makes use of a thread pool to handle each client connection in a distinct thread.
+* Is configurable via the env.properties file included in the jar distribution.
+* Buildable via Maven 2.
+
+===========
+Limitations
+===========
+
+* POST HTTP requests do not really do anything with the request body.
+* Only designed to deliver static HTML files.  Other content is untested.
+
+==================
+Build Instructions
+==================
+
+1) Checkout the source
+2) cd to SimpleHttpServer
+3) run mvn clean install
+
+==========
+How to Run
+==========
+
+1) Copy the compiled SimpleHttpServer-1.0.jar from the target directory to the desired
+   location on your machine.
+2) Create a subdirectory called 'site'.  Place any HTML files you would like to have
+   served in this directory.
+3) Return to the directory with the SimpleHttpServer jar in it.  Enter the following
+   command: java -jar SimpleHttpServer-1.0.jar
+4) Direct a browser to http://127.0.0.1:8080/.  You should see a welcome page indicating
+   that the server is running.
+5) Any other served page can by accessed by adding the full file name to the host url.
+   For example, if you have a page named 'index.html', you can access it by going to
+   http://127.0.0.1:8080/index.html.
+
+
+
+
